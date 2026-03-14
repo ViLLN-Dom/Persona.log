@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="PERSONA.LOG"/>
+<meta name="theme-color" content="#060610"/>
+<title>ARCANA</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;background:#060610;overscroll-behavior:none;}
+body{color:#e0e0e0;font-family:'Rajdhani',sans-serif;overflow-x:hidden;}
+input,button,select{font-family:'Rajdhani',sans-serif;}
+input::placeholder{color:#333;}
+input[type=number]::-webkit-inner-spin-button{opacity:1;}
+::-webkit-scrollbar{width:3px;}
+::-webkit-scrollbar-track{background:#0a0a16;}
+::-webkit-scrollbar-thumb{background:#2a2a3e;border-radius:2px;}
+
+:root{
+–c-body:#ff4757;
+–c-spirit:#5352ed;
+–c-mind:#ffa502;
+–c-soul:#2ed573;
+–c-play:#ff6eb4;
+–c-sleep-good:#2ed573;
+–c-sleep-warn:#ffa502;
+–c-sleep-danger:#ff4757;
+–bg:#060610;–bg2:#0a0a16;–bg3:#0f0f1e;–border:#1a1a2e;–border2:#2a2a3e;
+}
+
+@keyframes floatUp{0%{opacity:1;transform:translateY(0) scale(1);}50%{opacity:1;transform:translateY(-30px) scale(1.1);}100%{opacity:0;transform:translateY(-70px) scale(0.9);}}
+@keyframes slideIn{from{opacity:0;transform:translateX(-16px);}to{opacity:1;transform:translateX(0);}}
+@keyframes levelUp{0%{opacity:0;transform:translate(-50%,-50%) scale(0.5);}20%{opacity:1;transform:translate(-50%,-50%) scale(1.05);}80%{opacity:1;transform:translate(-50%,-50%) scale(1);}100%{opacity:0;transform:translate(-50%,-50%) scale(0.95);}}
+@keyframes pulse{0%,100%{opacity:0.4;}50%{opacity:1;}}
+@keyframes shimmer{0%{background-position:200% center;}100%{background-position:-200% center;}}
+@keyframes toastIn{from{opacity:0;transform:translateX(100%);}to{opacity:1;transform:translateX(0);}}
+@keyframes toastOut{from{opacity:1;transform:translateX(0);}to{opacity:0;transform:translateX(100%);}}
+@keyframes streakFlash{0%,100%{color:#ffa502;}50%{color:#fff;text-shadow:0 0 20px #ffa502;}}
+@keyframes warningPulse{0%,100%{opacity:0.7;transform:scale(1);}50%{opacity:1;transform:scale(1.01);}}
+
+.tab-content{animation:slideIn 0.25s ease;}
+.shimmer-text{background:linear-gradient(90deg,#fff 25%,#888 50%,#fff 75%);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:shimmer 3s linear infinite;}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.88);display:flex;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(6px);padding:16px;}
+.modal-box{background:var(–bg2);border-radius:4px;padding:28px;width:100%;max-width:360px;position:relative;}
+.corner{position:absolute;width:12px;height:12px;}
+.corner.tl{top:-1px;left:-1px;border-top:2px solid var(–cc);border-left:2px solid var(–cc);}
+.corner.tr{top:-1px;right:-1px;border-top:2px solid var(–cc);border-right:2px solid var(–cc);}
+.corner.bl{bottom:-1px;left:-1px;border-bottom:2px solid var(–cc);border-left:2px solid var(–cc);}
+.corner.br{bottom:-1px;right:-1px;border-bottom:2px solid var(–cc);border-right:2px solid var(–cc);}
+
+.stat-input{width:100%;background:var(–bg);border:1px solid #2a2a3e;color:#e0e0e0;padding:10px 12px;border-radius:2px;font-family:‘Rajdhani’,sans-serif;font-size:14px;outline:none;transition:border-color 0.2s;}
+.stat-input:focus{border-color:var(–cc,#5352ed);}
+
+.cat-btn{padding:14px 10px;background:rgba(255,255,255,0.03);border:1px solid #1a1a2e;border-radius:3px;color:#888;font-family:‘Rajdhani’,sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;text-align:left;transition:all 0.2s;width:100%;}
+.cat-btn:active{background:rgba(255,255,255,0.08);}
+
+.tab-btn{flex:1;padding:9px;background:transparent;border:none;color:#444;font-family:‘Rajdhani’,sans-serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:all 0.2s;}
+.tab-btn.active{background:#1a1a2e;color:#fff;}
+
+.action-btn{width:100%;padding:13px;border:1px solid rgba(255,255,255,0.15);color:#ccc;font-family:‘Rajdhani’,sans-serif;font-size:12px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:all 0.2s;background:rgba(255,255,255,0.04);}
+.action-btn.primary{border-color:var(–cc,#5352ed);color:var(–cc,#5352ed);background:rgba(255,255,255,0.02);}
+
+.card{background:var(–bg2);border:1px solid var(–border);border-radius:4px;padding:22px;margin-bottom:14px;}
+.card-label{font-size:9px;letter-spacing:4px;color:#333;margin-bottom:18px;}
+
+#levelup-splash{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:500;pointer-events:none;display:none;text-align:center;}
+#levelup-splash.show{display:block;animation:levelUp 2.5s ease forwards;}
+
+#toast-container{position:fixed;top:env(safe-area-inset-top,16px);right:0;z-index:400;display:flex;flex-direction:column;gap:8px;padding:16px;pointer-events:none;}
+.toast{background:#0f0f1e;border-left:3px solid var(–tc);padding:12px 16px;border-radius:3px;font-size:11px;letter-spacing:2px;color:#ccc;min-width:200px;animation:toastIn 0.3s ease;box-shadow:0 4px 20px rgba(0,0,0,0.5);}
+.toast.out{animation:toastOut 0.3s ease forwards;}
+
+.freq-chip{padding:6px 12px;background:rgba(255,255,255,0.04);border:1px solid #2a2a3e;border-radius:20px;font-size:10px;letter-spacing:1px;color:#888;cursor:pointer;white-space:nowrap;transition:all 0.2s;}
+.freq-chip:active{border-color:#444;color:#ccc;}
+
+/* Sleep check-in */
+.sleep-btn{flex:1;padding:14px 8px;background:rgba(255,255,255,0.03);border:1px solid #1a1a2e;border-radius:3px;font-family:‘Rajdhani’,sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all 0.2s;text-align:center;}
+.sleep-btn:active{opacity:0.8;}
+
+.sleep-warning{background:rgba(255,71,87,0.08);border:1px solid rgba(255,71,87,0.3);border-radius:4px;padding:14px 16px;animation:warningPulse 2s ease infinite;}
+</style>
+
+</head>
+<body>
+
+<div id="app" style="max-width:480px;margin:0 auto;padding:16px 14px 60px;padding-top:calc(env(safe-area-inset-top,0px) + 16px);position:relative;min-height:100vh;">
+  <div style="position:fixed;inset:0;pointer-events:none;z-index:50;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.025) 2px,rgba(0,0,0,0.025) 4px);"></div>
+  <div style="position:fixed;top:15%;left:5%;width:280px;height:280px;background:radial-gradient(circle,#5352ed0a 0%,transparent 70%);pointer-events:none;z-index:0;"></div>
+  <div style="position:fixed;bottom:15%;right:5%;width:200px;height:200px;background:radial-gradient(circle,#ff47570a 0%,transparent 70%);pointer-events:none;z-index:0;"></div>
+
+  <div style="position:relative;z-index:1;">
+    <!-- Header -->
+    <div style="text-align:center;margin-bottom:24px;">
+      <div style="font-size:9px;letter-spacing:6px;color:#333;margin-bottom:8px;">◈ LIFE STATUS SYSTEM ◈</div>
+      <h1 style="font-family:'Share Tech Mono',monospace;font-size:26px;font-weight:400;letter-spacing:4px;margin-bottom:6px;" class="shimmer-text">PERSONA<span style="-webkit-text-fill-color:#ff4757;">.</span>LOG</h1>
+      <div id="header-sub" style="font-size:9px;letter-spacing:3px;color:#333;"></div>
+    </div>
+
+
+<!-- Tabs -->
+<div style="display:flex;gap:2px;margin-bottom:20px;background:var(--bg2);padding:3px;border-radius:3px;border:1px solid var(--border);">
+  <button class="tab-btn active" onclick="switchTab('stats')" id="tab-stats">◈ STATS</button>
+  <button class="tab-btn" onclick="switchTab('log')" id="tab-log">⊕ LOG</button>
+  <button class="tab-btn" onclick="switchTab('history')" id="tab-history">⧗ HISTORY</button>
+</div>
+
+<!-- STATS TAB -->
+<div id="pane-stats" class="tab-content">
+  <div class="card" style="display:flex;align-items:center;gap:20px;">
+    <canvas id="radar" width="170" height="170" style="flex-shrink:0;"></canvas>
+    <div style="flex:1;min-width:0;">
+      <div style="font-size:9px;letter-spacing:3px;color:#444;margin-bottom:10px;">NEGLECTED</div>
+      <div id="neglect-icon" style="font-size:20px;margin-bottom:4px;"></div>
+      <div id="neglect-name" style="font-size:18px;font-weight:700;margin-bottom:2px;"></div>
+      <div id="neglect-level" style="font-size:10px;color:#666;margin-bottom:10px;letter-spacing:1px;"></div>
+      <div style="font-size:9px;letter-spacing:2px;color:#ff4757;animation:pulse 2s infinite;">▲ NEEDS ATTENTION</div>
+    </div>
+  </div>
+
+  <!-- Sleep status card -->
+  <div class="card" id="sleep-status-card">
+    <div class="card-label">── SLEEP STATUS ──</div>
+    <div id="sleep-status-body"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">── CHARACTER STATS ──</div>
+    <div id="stat-bars"></div>
+  </div>
+  <div class="card">
+    <div class="card-label">── TIME SPLIT ──</div>
+    <div id="time-split"></div>
+  </div>
+  <div class="card">
+    <div class="card-label">── STREAKS ──</div>
+    <div id="streaks-display"></div>
+  </div>
+</div>
+
+<!-- LOG TAB -->
+<div id="pane-log" class="tab-content" style="display:none;">
+  <!-- Sleep check-in always at top -->
+  <div class="card">
+    <div class="card-label">── DAILY SLEEP CHECK-IN ──</div>
+    <div id="sleep-checkin-body"></div>
+  </div>
+  <div class="card">
+    <div class="card-label">── LOG ACTIVITY ──</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;" id="cat-buttons"></div>
+  </div>
+</div>
+
+<!-- HISTORY TAB -->
+<div id="pane-history" class="tab-content" style="display:none;">
+  <div class="card">
+    <div class="card-label">── LEVEL-UP LOG ──</div>
+    <div id="levelup-log"></div>
+  </div>
+  <div class="card">
+    <div class="card-label">── SLEEP LOG ──</div>
+    <div id="sleep-log"></div>
+  </div>
+  <div class="card">
+    <div class="card-label">── RECENT ACTIVITIES ──</div>
+    <div id="activity-log"></div>
+  </div>
+</div>
+
+
+  </div>
+</div>
+
+<!-- Level-up splash -->
+
+<div id="levelup-splash">
+  <div style="font-size:11px;letter-spacing:6px;color:#ffa502;margin-bottom:8px;text-shadow:0 0 20px #ffa502;">LEVEL UP</div>
+  <div id="lu-stat" style="font-size:32px;font-weight:700;margin-bottom:4px;"></div>
+  <div id="lu-level" style="font-family:'Share Tech Mono',monospace;font-size:48px;"></div>
+</div>
+<div id="toast-container"></div>
+<div id="float-container" style="position:fixed;top:40%;right:20px;pointer-events:none;z-index:300;"></div>
+
+<!-- Activity Modal -->
+
+<div id="modal" class="modal-overlay" style="display:none;" onclick="closeModal()">
+  <div class="modal-box" id="modal-box" onclick="event.stopPropagation()">
+    <div class="corner tl" id="mc-tl"></div><div class="corner tr" id="mc-tr"></div>
+    <div class="corner bl" id="mc-bl"></div><div class="corner br" id="mc-br"></div>
+    <div style="margin-bottom:20px;display:flex;align-items:center;gap:10px;">
+      <span id="modal-icon" style="font-size:18px;"></span>
+      <span style="font-size:9px;letter-spacing:4px;color:#666;">LOG ACTIVITY</span>
+      <span id="modal-stat-name" style="font-size:9px;letter-spacing:3px;margin-left:auto;"></span>
+    </div>
+    <div id="freq-section" style="margin-bottom:14px;display:none;">
+      <div style="font-size:9px;letter-spacing:2px;color:#444;margin-bottom:8px;">RECENT</div>
+      <div id="freq-chips" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
+    </div>
+    <div style="margin-bottom:14px;">
+      <label style="display:block;font-size:9px;letter-spacing:2px;color:#555;margin-bottom:6px;">TASK NAME</label>
+      <input id="task-name" class="stat-input" placeholder="e.g. Morning run, Deep work..." onkeydown="if(event.key==='Enter')document.getElementById('task-hours').focus()"/>
+    </div>
+    <div style="margin-bottom:22px;">
+      <label style="display:block;font-size:9px;letter-spacing:2px;color:#555;margin-bottom:6px;">TIME SPENT (hours)</label>
+      <input id="task-hours" type="number" step="0.25" min="0.25" placeholder="0.5" class="stat-input" onkeydown="if(event.key==='Enter')submitTask()"/>
+    </div>
+    <button class="action-btn primary" id="modal-confirm" onclick="submitTask()">⊕ CONFIRM ACTIVITY</button>
+  </div>
+</div>
+
+<!-- Sleep modal -->
+
+<div id="sleep-modal" class="modal-overlay" style="display:none;" onclick="closeSleepModal()">
+  <div class="modal-box" style="--cc:#5352ed;border:1px solid #5352ed33;box-shadow:0 0 40px #5352ed11;" onclick="event.stopPropagation()">
+    <div class="corner tl" style="--cc:#5352ed;border-top:2px solid #5352ed;border-left:2px solid #5352ed;"></div>
+    <div class="corner tr" style="--cc:#5352ed;border-top:2px solid #5352ed;border-right:2px solid #5352ed;"></div>
+    <div class="corner bl" style="--cc:#5352ed;border-bottom:2px solid #5352ed;border-left:2px solid #5352ed;"></div>
+    <div class="corner br" style="--cc:#5352ed;border-bottom:2px solid #5352ed;border-right:2px solid #5352ed;"></div>
+
+
+<div style="margin-bottom:20px;display:flex;align-items:center;gap:10px;">
+  <span style="font-size:18px;color:#5352ed;filter:drop-shadow(0 0 6px #5352ed);">✦</span>
+  <span style="font-size:9px;letter-spacing:4px;color:#666;">SLEEP CHECK-IN</span>
+  <span style="font-size:9px;letter-spacing:3px;color:#5352ed;margin-left:auto;">SPIRIT</span>
+</div>
+
+<div style="margin-bottom:22px;">
+  <label style="display:block;font-size:9px;letter-spacing:2px;color:#555;margin-bottom:6px;">HOURS SLEPT LAST NIGHT</label>
+  <input id="sleep-hours-input" type="number" step="0.5" min="1" max="24" placeholder="8" class="stat-input" style="--cc:#5352ed;" onkeydown="if(event.key==='Enter')submitSleep()"/>
+  <div id="sleep-preview" style="margin-top:8px;font-size:10px;letter-spacing:1px;color:#444;min-height:16px;"></div>
+</div>
+
+<div style="margin-bottom:14px;">
+  <div style="font-size:9px;letter-spacing:2px;color:#444;margin-bottom:10px;">SLEEP QUALITY</div>
+  <div style="display:flex;gap:8px;">
+    <button class="sleep-btn" id="sq-poor" onclick="selectQuality('poor')" style="color:#ff4757;border-color:#ff475733;">😴 POOR</button>
+    <button class="sleep-btn" id="sq-good" onclick="selectQuality('good')" style="color:#2ed573;border-color:#2ed57333;">✓ GOOD</button>
+    <button class="sleep-btn" id="sq-great" onclick="selectQuality('great')" style="color:#ffa502;border-color:#ffa50233;">⚡ GREAT</button>
+  </div>
+</div>
+
+<button class="action-btn primary" style="--cc:#5352ed;border-color:#5352ed88;color:#5352ed;" onclick="submitSleep()">✦ LOG SLEEP</button>
+
+
+  </div>
+</div>
+
+<script>
+const SLEEP_TARGET = 8;
+const SLEEP_WARN = 10;
+
+const CATS = [
+  {id:'fitness', label:'Health & Fitness', short:'BODY',   icon:'⚔', color:'#ff4757'},
+  {id:'sleep',   label:'Rest & Recovery',  short:'SPIRIT', icon:'✦', color:'#5352ed', intentionalOnly:true},
+  {id:'work',    label:'Work & Career',    short:'MIND',   icon:'◈', color:'#ffa502'},
+  {id:'hobbies', label:'Hobbies & Creative',short:'SOUL',  icon:'❋', color:'#2ed573'},
+  {id:'play',    label:'Entertainment',    short:'PLAY',   icon:'◉', color:'#ff6eb4'},
+];
+
+function defaultState(){
+  return {
+    stats: Object.fromEntries(CATS.map(c=>[c.id,{xp:0,streak:0,lastDay:null}])),
+    tasks:[],
+    levelups:[],
+    sleepLog:[], // {day, hours, quality, date}
+    day:1,
+  };
+}
+
+function load(){
+  try{ const s=localStorage.getItem('persona_log_v3'); if(s) return JSON.parse(s); }catch(e){}
+  return defaultState();
+}
+function save(){ localStorage.setItem('persona_log_v3',JSON.stringify(STATE)); }
+
+let STATE=load();
+let activeTab='stats';
+let modalCat=null;
+let selectedQuality='good';
+
+// ── XP / LEVEL ────────────────────────────────────────────────────────────────
+function xpToLevel(xp){ return Math.min(99,Math.floor(Math.sqrt(xp/10))); }
+function xpForLevel(l){ return l*l*10; }
+function xpProgress(xp){
+  const l=xpToLevel(xp); if(l>=99) return 100;
+  return Math.round((xp-xpForLevel(l))/(xpForLevel(l+1)-xpForLevel(l))*100);
+}
+
+// ── STREAK ────────────────────────────────────────────────────────────────────
+function updateStreak(catId){
+  const s=STATE.stats[catId], today=STATE.day;
+  if(s.lastDay===today) return;
+  s.streak = s.lastDay===today-1 ? (s.streak||0)+1 : 1;
+  s.lastDay=today;
+}
+
+// ── SLEEP HELPERS ─────────────────────────────────────────────────────────────
+function todaySleep(){ return STATE.sleepLog.find(s=>s.day===STATE.day)||null; }
+function sleepZone(hours){
+  if(hours>=SLEEP_WARN) return 'danger';
+  if(hours>=7 && hours<=9) return 'good';
+  return 'warn';
+}
+function sleepZoneColor(zone){
+  return zone==='good'?'#2ed573':zone==='warn'?'#ffa502':'#ff4757';
+}
+function sleepZoneLabel(hours){
+  if(hours>=SLEEP_WARN) return `⚠ EXCESSIVE — ${hours}h logged. Time in bed may be avoidance.`;
+  if(hours<7) return `⚡ UNDER TARGET — aim for ${SLEEP_TARGET}h`;
+  if(hours<=9) return `✓ ON TARGET — good recovery`;
+  return '';
+}
+
+// ── RADAR ──────────────────────────────────────────────────────────────────────
+function drawRadar(){
+  const cv=document.getElementById('radar'); if(!cv) return;
+  const ctx=cv.getContext('2d');
+  const W=170,H=170,cx=W/2,cy=H/2,r=58,n=CATS.length;
+  ctx.clearRect(0,0,W,H);
+  for(let ring=1;ring<=4;ring++){
+    ctx.beginPath();
+    CATS.forEach((_,i)=>{ const a=(i/n)*Math.PI*2-Math.PI/2,fr=ring/4; i===0?ctx.moveTo(cx+Math.cos(a)*r*fr,cy+Math.sin(a)*r*fr):ctx.lineTo(cx+Math.cos(a)*r*fr,cy+Math.sin(a)*r*fr); });
+    ctx.closePath(); ctx.strokeStyle='rgba(255,255,255,0.06)'; ctx.lineWidth=1; ctx.stroke();
+  }
+  CATS.forEach((_,i)=>{ const a=(i/n)*Math.PI*2-Math.PI/2; ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+Math.cos(a)*r,cy+Math.sin(a)*r); ctx.strokeStyle='rgba(255,255,255,0.06)'; ctx.stroke(); });
+  ctx.beginPath();
+  CATS.forEach((cat,i)=>{ const lvl=xpToLevel(STATE.stats[cat.id].xp),frac=lvl/99,a=(i/n)*Math.PI*2-Math.PI/2; i===0?ctx.moveTo(cx+Math.cos(a)*r*frac,cy+Math.sin(a)*r*frac):ctx.lineTo(cx+Math.cos(a)*r*frac,cy+Math.sin(a)*r*frac); });
+  ctx.closePath(); ctx.fillStyle='rgba(255,255,255,0.04)'; ctx.fill(); ctx.strokeStyle='rgba(255,255,255,0.25)'; ctx.lineWidth=1.5; ctx.stroke();
+  CATS.forEach((cat,i)=>{ const lvl=xpToLevel(STATE.stats[cat.id].xp),frac=lvl/99,a=(i/n)*Math.PI*2-Math.PI/2,x=cx+Math.cos(a)*r*frac,y=cy+Math.sin(a)*r*frac,lx=cx+Math.cos(a)*(r+18),ly=cy+Math.sin(a)*(r+18); ctx.beginPath(); ctx.arc(x,y,4,0,Math.PI*2); ctx.fillStyle=cat.color; ctx.shadowColor=cat.color; ctx.shadowBlur=8; ctx.fill(); ctx.shadowBlur=0; ctx.font='bold 9px Rajdhani,sans-serif'; ctx.fillStyle=cat.color; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(cat.short,lx,ly); });
+}
+
+// ── SLEEP STATUS (stats tab) ──────────────────────────────────────────────────
+function renderSleepStatus(){
+  const el=document.getElementById('sleep-status-body');
+  const ts=todaySleep();
+  if(!ts){
+    el.innerHTML=`
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="font-size:12px;color:#555;letter-spacing:2px;margin-bottom:4px;">NOT LOGGED TODAY</div>
+        <div style="font-size:10px;color:#333;letter-spacing:1px;">Log sleep in the ⊕ LOG tab</div>
+      </div>
+      <div style="font-size:28px;color:#2a2a3e;">✦</div>
+    </div>`;
+    return;
+  }
+  const zone=sleepZone(ts.hours);
+  const color=sleepZoneColor(zone);
+  const label=sleepZoneLabel(ts.hours);
+  const qColors={poor:'#ff4757',good:'#2ed573',great:'#ffa502'};
+  const qIcons={poor:'😴',good:'✓',great:'⚡'};
+
+  el.innerHTML=`
+  ${zone==='danger'?`<div class="sleep-warning" style="margin-bottom:14px;">
+    <div style="font-size:10px;letter-spacing:2px;color:#ff4757;margin-bottom:4px;">⚠ EXCESSIVE SLEEP DETECTED</div>
+    <div style="font-size:11px;color:#ff475799;letter-spacing:1px;">Time in bed may be avoidance behavior. Consider getting up and logging an activity.</div>
+  </div>`:''}
+  <div style="display:flex;align-items:center;gap:16px;margin-bottom:14px;">
+    <div style="text-align:center;">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:36px;color:${color};text-shadow:0 0 16px ${color};line-height:1;">${ts.hours}</div>
+      <div style="font-size:9px;letter-spacing:2px;color:#444;margin-top:2px;">HOURS</div>
+    </div>
+    <div style="flex:1;">
+      <div style="height:6px;background:#0a0a16;border-radius:3px;overflow:hidden;margin-bottom:6px;border:1px solid #1a1a2e;">
+        <div style="height:100%;width:${Math.min(100,(ts.hours/12)*100)}%;background:${color};border-radius:3px;box-shadow:0 0 8px ${color}55;transition:width 0.6s ease;"></div>
+      </div>
+      <div style="font-size:10px;color:${color};letter-spacing:1px;">${label}</div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;justify-content:space-between;">
+    <div style="font-size:10px;letter-spacing:2px;color:#444;">QUALITY</div>
+    <div style="display:flex;align-items:center;gap:6px;">
+      <span style="font-size:13px;">${qIcons[ts.quality]||'✓'}</span>
+      <span style="font-size:12px;letter-spacing:2px;color:${qColors[ts.quality]||'#2ed573'};">${(ts.quality||'good').toUpperCase()}</span>
+    </div>
+  </div>`;
+}
+
+// ── SLEEP CHECK-IN (log tab) ──────────────────────────────────────────────────
+function renderSleepCheckin(){
+  const el=document.getElementById('sleep-checkin-body');
+  const ts=todaySleep();
+  if(ts){
+    const zone=sleepZone(ts.hours);
+    const color=sleepZoneColor(zone);
+    el.innerHTML=`
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="color:#5352ed;font-size:16px;filter:drop-shadow(0 0 5px #5352ed);">✦</span>
+        <div>
+          <div style="font-size:13px;color:#ccc;">Logged: ${ts.hours}h — ${ts.quality.toUpperCase()}</div>
+          <div style="font-size:10px;color:${color};letter-spacing:1px;margin-top:2px;">${sleepZoneLabel(ts.hours)}</div>
+        </div>
+      </div>
+      <button onclick="openSleepModal()" style="background:none;border:1px solid #2a2a3e;color:#555;font-family:'Rajdhani',sans-serif;font-size:9px;letter-spacing:2px;padding:6px 10px;cursor:pointer;border-radius:2px;">EDIT</button>
+    </div>`;
+  } else {
+    el.innerHTML=`
+    <div style="font-size:11px;color:#555;letter-spacing:1px;margin-bottom:14px;">How much did you sleep last night?</div>
+    <button class="action-btn" onclick="openSleepModal()" style="border-color:#5352ed44;color:#5352ed;">✦ LOG SLEEP</button>`;
+  }
+}
+
+// ── STAT BARS ─────────────────────────────────────────────────────────────────
+function renderStatBars(){
+  document.getElementById('stat-bars').innerHTML=CATS.map(cat=>{
+    const xp=STATE.stats[cat.id].xp, lvl=xpToLevel(xp), prog=xpProgress(xp);
+    const note=cat.intentionalOnly?`<span style="font-size:8px;color:#333;margin-left:6px;letter-spacing:1px;">INTENTIONAL REST ONLY</span>`:'';
+    return `
+    <div style="margin-bottom:18px;">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="color:${cat.color};font-size:15px;filter:drop-shadow(0 0 5px ${cat.color})">${cat.icon}</span>
+          <span style="font-size:12px;letter-spacing:3px;color:#888;">${cat.short}</span>${note}
+        </div>
+        <div style="display:flex;align-items:baseline;gap:5px;">
+          <span style="font-size:10px;color:#555;letter-spacing:1px;">LV</span>
+          <span style="font-family:'Share Tech Mono',monospace;font-size:24px;color:${cat.color};text-shadow:0 0 10px ${cat.color};line-height:1;">${String(lvl).padStart(2,'0')}</span>
+        </div>
+      </div>
+      <div style="height:7px;background:#0a0a16;border-radius:4px;border:1px solid #1a1a2e;overflow:hidden;">
+        <div style="height:100%;width:${prog}%;background:linear-gradient(90deg,${cat.color}88,${cat.color});box-shadow:0 0 8px ${cat.color}66;border-radius:4px;transition:width 0.7s cubic-bezier(0.34,1.56,0.64,1);position:relative;">
+          <div style="position:absolute;right:0;top:0;bottom:0;width:2px;background:white;opacity:0.5;"></div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:4px;">
+        <span style="font-size:9px;color:#333;letter-spacing:1px;">${xp} XP</span>
+        <span style="font-family:'Share Tech Mono',monospace;font-size:9px;color:#333;">${prog}%</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── TIME SPLIT ─────────────────────────────────────────────────────────────────
+function renderTimeSplit(){
+  const el=document.getElementById('time-split');
+  const total=STATE.tasks.reduce((a,t)=>a+t.hours,0);
+  if(!total){ el.innerHTML='<div style="font-size:11px;color:#333;letter-spacing:2px;text-align:center;padding:12px 0;">LOG ACTIVITIES TO SEE BREAKDOWN</div>'; return; }
+  el.innerHTML=CATS.map(cat=>{
+    const hrs=STATE.tasks.filter(t=>t.catId===cat.id).reduce((a,t)=>a+t.hours,0);
+    const pct=total?(hrs/total)*100:0;
+    return `
+    <div style="margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+        <span style="font-size:11px;letter-spacing:2px;color:${cat.color};">${cat.short}</span>
+        <span style="font-family:'Share Tech Mono',monospace;font-size:10px;color:#555;">${hrs.toFixed(1)}h · ${Math.round(pct)}%</span>
+      </div>
+      <div style="height:5px;background:#0a0a16;border-radius:2px;overflow:hidden;">
+        <div style="height:100%;width:${pct}%;background:${cat.color};border-radius:2px;box-shadow:0 0 6px ${cat.color}55;transition:width 0.6s ease;"></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── STREAKS ────────────────────────────────────────────────────────────────────
+function renderStreaks(){
+  document.getElementById('streaks-display').innerHTML=CATS.map(cat=>{
+    const s=STATE.stats[cat.id].streak||0;
+    const fire=s>=7?'🔥':s>=3?'⚡':'·';
+    return `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #0f0f1e;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="color:${cat.color};font-size:13px;">${cat.icon}</span>
+        <span style="font-size:12px;letter-spacing:2px;color:#888;">${cat.short}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <span style="font-family:'Share Tech Mono',monospace;font-size:13px;color:${s>0?'#ffa502':'#333'};${s>=3?'animation:streakFlash 1.5s infinite;':''}">${s} DAY${s!==1?'S':''}</span>
+        <span>${fire}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── NEGLECT ────────────────────────────────────────────────────────────────────
+function renderNeglect(){
+  const n=[...CATS].sort((a,b)=>xpToLevel(STATE.stats[a.id].xp)-xpToLevel(STATE.stats[b.id].xp))[0];
+  const lvl=xpToLevel(STATE.stats[n.id].xp);
+  const ni=document.getElementById('neglect-icon'); ni.textContent=n.icon; ni.style.color=n.color; ni.style.filter=`drop-shadow(0 0 6px ${n.color})`;
+  const nn=document.getElementById('neglect-name'); nn.textContent=n.short; nn.style.color=n.color; nn.style.textShadow=`0 0 12px ${n.color}`;
+  document.getElementById('neglect-level').textContent=`Level ${lvl} · Falling behind`;
+}
+
+// ── HEADER ─────────────────────────────────────────────────────────────────────
+function renderHeader(){
+  const total=STATE.tasks.reduce((a,t)=>a+t.hours,0);
+  document.getElementById('header-sub').textContent=`DAY ${String(STATE.day).padStart(3,'0')}  ·  ${total.toFixed(1)}h LOGGED`;
+}
+
+// ── CAT BUTTONS ────────────────────────────────────────────────────────────────
+function renderCatButtons(){
+  document.getElementById('cat-buttons').innerHTML=CATS.map(cat=>{
+    const lvl=xpToLevel(STATE.stats[cat.id].xp);
+    const note=cat.intentionalOnly?`<div style="font-size:8px;color:${cat.color}55;margin-top:3px;letter-spacing:0px;">intentional only</div>`:'';
+    return `
+    <button class="cat-btn" onclick="openModal('${cat.id}')" style="border-color:${cat.color}22;">
+      <div style="font-size:16px;margin-bottom:6px;color:${cat.color};filter:drop-shadow(0 0 4px ${cat.color})">${cat.icon}</div>
+      <div style="color:${cat.color};letter-spacing:2px;font-size:11px;">${cat.short}</div>
+      <div style="font-size:9px;color:${cat.color}77;margin-top:2px;letter-spacing:1px;">LV ${lvl}</div>
+      ${note}
+    </button>`;
+  }).join('');
+}
+
+// ── SLEEP LOG (history) ────────────────────────────────────────────────────────
+function renderSleepLog(){
+  const el=document.getElementById('sleep-log');
+  const log=[...STATE.sleepLog].reverse().slice(0,14);
+  if(!log.length){ el.innerHTML='<div style="font-size:11px;color:#333;letter-spacing:2px;text-align:center;padding:12px 0;">NO SLEEP LOGGED YET</div>'; return; }
+  const qIcons={poor:'😴',good:'✓',great:'⚡'};
+  const qColors={poor:'#ff4757',good:'#2ed573',great:'#ffa502'};
+  el.innerHTML=log.map(s=>{
+    const zone=sleepZone(s.hours), color=sleepZoneColor(zone);
+    return `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid #0f0f1e;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-family:'Share Tech Mono',monospace;font-size:18px;color:${color};text-shadow:0 0 8px ${color};">${s.hours}h</span>
+        <div>
+          <div style="font-size:10px;color:${qColors[s.quality]||'#2ed573'};letter-spacing:1px;">${qIcons[s.quality]||'✓'} ${(s.quality||'good').toUpperCase()}</div>
+          ${zone==='danger'?`<div style="font-size:9px;color:#ff4757;margin-top:2px;">⚠ EXCESSIVE</div>`:zone==='warn'?`<div style="font-size:9px;color:#ffa502;margin-top:2px;">UNDER TARGET</div>`:''}
+        </div>
+      </div>
+      <span style="font-size:9px;color:#444;letter-spacing:1px;">DAY ${String(s.day).padStart(3,'0')}</span>
+    </div>`;
+  }).join('');
+}
+
+// ── ACTIVITY LOG ───────────────────────────────────────────────────────────────
+function renderActivityLog(){
+  const el=document.getElementById('activity-log');
+  const tasks=[...STATE.tasks].reverse().slice(0,20);
+  if(!tasks.length){ el.innerHTML='<div style="font-size:11px;color:#333;letter-spacing:2px;text-align:center;padding:12px 0;">NO ACTIVITIES YET</div>'; return; }
+  el.innerHTML=tasks.map(t=>{
+    const cat=CATS.find(c=>c.id===t.catId)||CATS[0];
+    return `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #0f0f1e;">
+      <div style="display:flex;align-items:center;gap:10px;min-width:0;">
+        <span style="color:${cat.color};font-size:12px;flex-shrink:0;">${cat.icon}</span>
+        <div style="min-width:0;">
+          <div style="font-size:13px;color:#ccc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;">${t.name}</div>
+          <div style="font-size:9px;letter-spacing:1px;color:#444;margin-top:2px;">DAY ${String(t.day).padStart(3,'0')} · ${cat.short}</div>
+        </div>
+      </div>
+      <div style="text-align:right;flex-shrink:0;margin-left:10px;">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:${cat.color};">+${t.xp} XP</div>
+        <div style="font-size:9px;color:#444;margin-top:2px;">${t.hours}h</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── LEVELUP LOG ────────────────────────────────────────────────────────────────
+function renderLevelupLog(){
+  const el=document.getElementById('levelup-log');
+  const log=[...STATE.levelups].reverse().slice(0,10);
+  if(!log.length){ el.innerHTML='<div style="font-size:11px;color:#333;letter-spacing:2px;text-align:center;padding:12px 0;">LEVEL UP TO SEE LOG</div>'; return; }
+  el.innerHTML=log.map(l=>{
+    const cat=CATS.find(c=>c.id===l.catId)||CATS[0];
+    return `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid #0f0f1e;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="color:${cat.color};font-size:13px;filter:drop-shadow(0 0 4px ${cat.color})">${cat.icon}</span>
+        <span style="font-size:13px;color:${cat.color};letter-spacing:2px;">${cat.short}</span>
+        <span style="font-size:11px;color:#666;">reached</span>
+        <span style="font-family:'Share Tech Mono',monospace;font-size:13px;color:#ffa502;">LV ${l.level}</span>
+      </div>
+      <span style="font-size:9px;color:#444;letter-spacing:1px;">DAY ${String(l.day).padStart(3,'0')}</span>
+    </div>`;
+  }).join('');
+}
+
+// ── FREQUENT ───────────────────────────────────────────────────────────────────
+function getFrequent(catId){
+  const counts={};
+  STATE.tasks.filter(t=>t.catId===catId).forEach(t=>{ counts[t.name]=(counts[t.name]||0)+1; });
+  return Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,5).map(e=>e[0]);
+}
+
+// ── SLEEP MODAL ────────────────────────────────────────────────────────────────
+function openSleepModal(){
+  selectedQuality='good';
+  const ts=todaySleep();
+  document.getElementById('sleep-hours-input').value=ts?ts.hours:'';
+  if(ts) selectQuality(ts.quality||'good');
+  else { ['poor','good','great'].forEach(q=>{ const b=document.getElementById('sq-'+q); b.style.background=q==='good'?'rgba(46,213,115,0.12)':'rgba(255,255,255,0.03)'; b.style.fontWeight=q==='good'?'700':'400'; }); }
+  document.getElementById('sleep-preview').textContent='';
+  document.getElementById('sleep-modal').style.display='flex';
+  setTimeout(()=>{ document.getElementById('sleep-hours-input').focus(); },100);
+  document.getElementById('sleep-hours-input').oninput=updateSleepPreview;
+}
+
+function updateSleepPreview(){
+  const h=parseFloat(document.getElementById('sleep-hours-input').value);
+  const el=document.getElementById('sleep-preview');
+  if(!h){ el.textContent=''; return; }
+  const zone=sleepZone(h), color=sleepZoneColor(zone);
+  el.style.color=color;
+  el.textContent=sleepZoneLabel(h);
+}
+
+function selectQuality(q){
+  selectedQuality=q;
+  const colors={poor:'#ff4757',good:'#2ed573',great:'#ffa502'};
+  ['poor','good','great'].forEach(qq=>{
+    const b=document.getElementById('sq-'+qq);
+    b.style.background=qq===q?`rgba(255,255,255,0.08)`:'rgba(255,255,255,0.03)';
+    b.style.borderColor=qq===q?colors[qq]+'88':'#1a1a2e';
+    b.style.fontWeight=qq===q?'700':'400';
+  });
+}
+
+function closeSleepModal(){ document.getElementById('sleep-modal').style.display='none'; }
+
+function submitSleep(){
+  const h=parseFloat(document.getElementById('sleep-hours-input').value);
+  if(!h||h<1) return;
+  const existing=STATE.sleepLog.findIndex(s=>s.day===STATE.day);
+  const entry={day:STATE.day,hours:h,quality:selectedQuality,date:new Date().toISOString()};
+  if(existing>=0) STATE.sleepLog[existing]=entry;
+  else STATE.sleepLog.push(entry);
+
+  // SPIRIT XP: quality bonus only, not hours (intentional rest reward)
+  const qXP={poor:5,good:15,great:25};
+  const xpGain=qXP[selectedQuality]||15;
+  const prevLevel=xpToLevel(STATE.stats.sleep.xp);
+  STATE.stats.sleep.xp+=xpGain;
+  const newLevel=xpToLevel(STATE.stats.sleep.xp);
+  updateStreak('sleep');
+
+  if(newLevel>prevLevel){
+    STATE.levelups.push({catId:'sleep',level:newLevel,day:STATE.day,date:new Date().toISOString()});
+    showLevelUp(CATS.find(c=>c.id==='sleep'),newLevel);
+  }
+
+  const zone=sleepZone(h);
+  if(zone==='danger') showToast('⚠ Excessive sleep flagged','#ff4757');
+  else if(zone==='warn') showToast('Sleep under target','#ffa502');
+  else showToast(`+${xpGain} XP · SPIRIT`,'#5352ed');
+
+  save(); closeSleepModal(); renderAll();
+  if(zone!=='danger') showXPFloat(xpGain,'#5352ed');
+}
+
+// ── ACTIVITY MODAL ─────────────────────────────────────────────────────────────
+function openModal(catId){
+  modalCat=CATS.find(c=>c.id===catId);
+  const cc=modalCat.color;
+  const mb=document.getElementById('modal-box');
+  mb.style.border=`1px solid ${cc}33`; mb.style.boxShadow=`0 0 40px ${cc}11`;
+  ['mc-tl','mc-tr','mc-bl','mc-br'].forEach(id=>{ const el=document.getElementById(id); el.style.borderColor=cc; });
+  document.getElementById('modal-icon').textContent=modalCat.icon; document.getElementById('modal-icon').style.color=cc; document.getElementById('modal-icon').style.filter=`drop-shadow(0 0 6px ${cc})`;
+  document.getElementById('modal-stat-name').textContent=modalCat.short; document.getElementById('modal-stat-name').style.color=cc;
+  document.getElementById('modal-confirm').style.borderColor=cc+'88'; document.getElementById('modal-confirm').style.color=cc;
+  const freq=getFrequent(catId), fs=document.getElementById('freq-section'), fc=document.getElementById('freq-chips');
+  if(freq.length){ fs.style.display='block'; fc.innerHTML=freq.map(f=>`<button class="freq-chip" onclick="fillTask('${f.replace(/'/g,"\\'")}')">${f}</button>`).join(''); }
+  else fs.style.display='none';
+  document.getElementById('task-name').value=''; document.getElementById('task-hours').value='';
+  document.getElementById('modal').style.display='flex';
+  setTimeout(()=>document.getElementById('task-name').focus(),100);
+}
+function fillTask(name){ document.getElementById('task-name').value=name; document.getElementById('task-hours').focus(); }
+function closeModal(){ document.getElementById('modal').style.display='none'; modalCat=null; }
+function submitTask(){
+  if(!modalCat) return;
+  const name=document.getElementById('task-name').value.trim(); if(!name) return;
+  const hours=parseFloat(document.getElementById('task-hours').value)||0.5;
+  const xpGain=Math.round(hours*30), catId=modalCat.id;
+  const prevLevel=xpToLevel(STATE.stats[catId].xp);
+  STATE.stats[catId].xp+=xpGain;
+  const newLevel=xpToLevel(STATE.stats[catId].xp);
+  updateStreak(catId);
+  STATE.tasks.push({catId,name,hours,xp:xpGain,date:new Date().toISOString(),day:STATE.day});
+  if(newLevel>prevLevel){ STATE.levelups.push({catId,level:newLevel,day:STATE.day,date:new Date().toISOString()}); showLevelUp(modalCat,newLevel); }
+  save(); closeModal(); renderAll();
+  showXPFloat(xpGain,modalCat.color);
+  showToast(`+${xpGain} XP · ${modalCat.short}`,modalCat.color);
+}
+
+// ── FX ──────────────────────────────────────────────────────────────────────────
+function showXPFloat(xp,color){
+  const el=document.createElement('div');
+  el.style.cssText=`font-family:'Share Tech Mono',monospace;font-size:20px;color:${color};text-shadow:0 0 10px ${color};animation:floatUp 1.8s ease forwards;margin-bottom:4px;`;
+  el.textContent=`+${xp} XP`; document.getElementById('float-container').appendChild(el);
+  setTimeout(()=>el.remove(),1900);
+}
+function showToast(msg,color='#fff'){
+  const tc=document.getElementById('toast-container'), el=document.createElement('div');
+  el.className='toast'; el.style.setProperty('--tc',color); el.textContent=msg; tc.appendChild(el);
+  setTimeout(()=>{ el.classList.add('out'); setTimeout(()=>el.remove(),400); },2500);
+}
+function showLevelUp(cat,level){
+  const el=document.getElementById('levelup-splash');
+  document.getElementById('lu-stat').textContent=cat.short; document.getElementById('lu-stat').style.color=cat.color; document.getElementById('lu-stat').style.textShadow=`0 0 20px ${cat.color}`;
+  document.getElementById('lu-level').textContent=String(level).padStart(2,'0'); document.getElementById('lu-level').style.color=cat.color; document.getElementById('lu-level').style.textShadow=`0 0 30px ${cat.color}`;
+  el.className='show'; setTimeout(()=>{ el.className=''; },2600);
+}
+
+// ── TABS ───────────────────────────────────────────────────────────────────────
+function switchTab(tab){
+  activeTab=tab;
+  ['stats','log','history'].forEach(t=>{ document.getElementById('pane-'+t).style.display=t===tab?'block':'none'; document.getElementById('tab-'+t).classList.toggle('active',t===tab); });
+  if(tab==='stats') drawRadar();
+}
+
+// ── RENDER ALL ─────────────────────────────────────────────────────────────────
+function renderAll(){
+  renderHeader(); renderNeglect(); renderStatBars(); renderTimeSplit(); renderStreaks();
+  renderSleepStatus(); renderSleepCheckin(); renderCatButtons();
+  renderActivityLog(); renderLevelupLog(); renderSleepLog(); drawRadar();
+}
+
+renderAll();
+</script>
+
+</body>
+</html>
