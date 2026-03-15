@@ -268,7 +268,8 @@ function defaultState(){
     tasks:[],
     levelups:[],
     sleepLog:[], // {day, hours, quality, date}
-    day:1,
+    day: new Date().toDateString(),
+
   };
 }
 
@@ -293,10 +294,12 @@ function xpProgress(xp){
 
 // ── STREAK ────────────────────────────────────────────────────────────────────
 function updateStreak(catId){
-  const s=STATE.stats[catId], today=STATE.day;
-  if(s.lastDay===today) return;
-  s.streak = s.lastDay===today-1 ? (s.streak||0)+1 : 1;
-  s.lastDay=today;
+  const s = STATE.stats[catId];
+  const today = new Date().toDateString();
+  const yesterday = new Date(Date.now() - 86400000).toDateString();
+  if(s.lastDay === today) return;
+  s.streak = s.lastDay === yesterday ? (s.streak || 0) + 1 : 1;
+  s.lastDay = today;
 }
 
 // ── SLEEP HELPERS ─────────────────────────────────────────────────────────────
@@ -488,7 +491,7 @@ function renderNeglect(){
 // ── HEADER ─────────────────────────────────────────────────────────────────────
 function renderHeader(){
   const total=STATE.tasks.reduce((a,t)=>a+t.hours,0);
-  document.getElementById('header-sub').textContent=`DAY ${String(STATE.day).padStart(3,'0')}  ·  ${total.toFixed(1)}h LOGGED`;
+  document.getElementById('header-sub').textContent=`${new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})}  ·  ${total.toFixed(1)}h LOGGED`;
 }
 
 // ── CAT BUTTONS ────────────────────────────────────────────────────────────────
